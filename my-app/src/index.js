@@ -57,22 +57,28 @@ function Square(props){
       }
     }
     handleClick(i){
-                                              // aqui nos aseguramos que vamos a guardar los cambios que se hagan de ahora en adelante
+      // aqui nos aseguramos que vamos a guardar los cambios que se hagan de ahora en adelante
+      // y es +1 porque en el metodo 'slice', el limite superior no se incluye
       const history = this.state.history.slice(0, this.state.stepNumber + 1);
       const current = history[history.length-1];
+      // se hace una copia de los cuadros que tenemos hasta el momento
       const squares = current.squares.slice();
       // esto quiere decir que, si ya hay un ganador, o si ese cuadrito ya esta ocupado, entonces no hace nada, por eso el return;
       // de resto todo sigue igual.
-      if(calculateWinner(squares) || squares[i]){ 
+      if(calculateWinner(squares) || squares[i]) { 
         return;
       }
       //si xIsNext es verdadero, pues pongo 'X', si no, pongo 'O'
       squares[i] = this.state.xIsNext ? 'X' : 'O';
       this.setState({
+        // Lo que hacen aqui es como hacerle un .push() al arreglo de history (pero ojo, que este arreglo history es el que tenemos aqui, local, dentro de este metodo 'handleClick()')
+        // solo que no se afecta al arreglo que hay local sino que se hace una copia, muy similar al proceso de usar el '.slice()'
         history: history.concat([{
           squares: squares,
         }]),
+        // como en el paso 'squares[i] = this.state.xIsNext ? 'X' : 'O';' lo que se hizo fue llenar el cuadrito correspondiente, entonces ahora cambiamos de jugador, es el turno de 'la otra persona', por decirlo asi.
         xIsNext: !this.state.xIsNext,
+        // bueno, aqui me surge una duda, este history, es el local, o el de toda la clase Game?
         stepNumber: history.length,
       });
     }
@@ -135,11 +141,20 @@ function Square(props){
       [0, 4, 8],
       [2, 4, 6],
     ];
-    for(let i = 0; i < lines.length; i++){
+    for(let i = 0; i < lines.length; i++) {
       //no sabia que esto se podia hacer
       // es decir aqui hacen como una copia de la linea que se este evaluando.
+      // por ejemplo, si esta linea es la primera, [a, b, c] seria: [0, 1, 2]
       const [a, b, c] = lines[i];
+      console.log('hello!');
+
       // pero no entiendo este pedazo...
+      // ya ya: el primer squares[a] es para determinar que de hecho haya algo en la primera posicion, sea una 'X' o una 'O', porque si no hay pues, para que seguir revisando.
+      // luego de verificar que haya algo en la primera posicion, empieza a comparar. 
+      // volviendo a tomar como ejemplo la primera linea ([0, 1, 2]), lo que esta haciendo es comparar si 
+      // lo que hay en el primer cuadro es lo mismo en los otros dos siguientes
+      // este proceso verifica que lo que haya en dicha linea (sea vertical, horizontal o diagonal) sea lo mismo
+      // porque si se trata del mismo elemento, quiere decir que hayamos un ganador!
       if(squares[a] && squares[a] === squares[b] && squares[a] === squares[c]){ 
         return squares[a];
       }
